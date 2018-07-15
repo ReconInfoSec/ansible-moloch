@@ -4,3 +4,5 @@
 - name: Install deb
   apt:
     deb: https://files.molo.ch/builds/ubuntu-16.04/moloch_1.1.1-1_amd64.deb
+
+- include_tasks: nginx.yml
