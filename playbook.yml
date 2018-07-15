@@ -1,0 +1,6 @@
+---
+- name: Configure Moloch
+  hosts: moloch
+  roles:
+    - { role: ruby }
+    - { role: moloch }
