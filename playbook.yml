@@ -1,4 +1,10 @@
 ---
+
+- name: Configure ElasticSearch
+  hosts: moloch
+  roles:
+    - { role: elasticsearch, elasticsearch_network_host: '0.0.0.0', elasticsearch_http_port: '9200'}
+
 - name: Configure Moloch
   hosts: moloch
   roles:
