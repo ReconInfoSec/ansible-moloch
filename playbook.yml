@@ -10,3 +10,17 @@
   roles:
     - { role: ruby }
     - { role: moloch }
+
+- name: Install glance
+  hosts: elk
+  tasks:
+
+    - apt:
+        name: glance
+
+- name: Install netdata
+  hosts: elk
+  tasks:
+
+    - apt:
+        name: netdata
