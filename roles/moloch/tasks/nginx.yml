@@ -1,3 +1,4 @@
+
 - name: Install/Setup Nginx
   package:
     name: '{{ item }}'
@@ -21,7 +22,7 @@
 
 - name: Copy nginx.conf
   template:
-    src: files/nginx/nginx.conf
+    src: files/nginx.conf
     dest:  /etc/nginx/nginx.conf
 
 - name: Copy nginx_moloch.conf

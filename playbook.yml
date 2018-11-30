@@ -9,18 +9,16 @@
   hosts: moloch
   roles:
     - { role: ruby }
-    - { role: moloch }
+    - { role: moloch, elasticsearch_network_host: '0.0.0.0', elasticsearch_http_port: '9200', elasticsearch_network_protocol: 'https', moloch_interface: 'eth0', elastic_local: 'yes', moloch_admin_password: 'PASSWORD' }
 
-- name: Install glance
-  hosts: elk
+- name: Install extra packages
+  hosts: moloch
   tasks:
 
-    - apt:
+    - name: Install glance
+      apt:
         name: glance
 
-- name: Install netdata
-  hosts: elk
-  tasks:
-
-    - apt:
+    - name: Install netdata
+      apt:
         name: netdata

@@ -5,4 +5,33 @@
   apt:
     deb: https://files.molo.ch/builds/ubuntu-16.04/moloch_1.1.1-1_amd64.deb
 
+- name: Run configuration script
+  shell: /data/moloch/bin/Configure
+  environment:
+    MOLOCH_INTERFACE: "{{ moloch_interface }}"
+    MOLOCH_LOCALELASTICSEARCH: "{{ elastic_local }}"
+    MOLOCH_ELASTICSEARCH: "{{ elasticsearch_network_protocol }}://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }}"
+    MOLOCH_PASSWORD: "{{ moloch_admin_password }}"
+    MOLOCH_INET: yes"
+  tags:
+    - moloch
+
+- name: Initialize Elasticsearch
+  command: /data/moloch/db/db.pl {{ elasticsearch_network_protocol }}://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }} init
+
+- name: Add Admin user
+  command: /data/moloch/bin/moloch_add_user.sh admin "Admin User" "{{ moloch_admin_password }}" --admin
+
+- name: Start and enable molochcapture
+  service:
+    name: molochcapture
+    state: started
+    enabled: yes
+
+- name: Start and enable molochviewer
+  service:
+    name: molochviewer
+    state: started
+    enabled: yes
+
 - include_tasks: nginx.yml

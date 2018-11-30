@@ -1,52 +1,42 @@
 ---
-- import_tasks: RedHat.yml
-  when: ansible_os_family == 'RedHat'
+- name: Debian/Ubuntu | Install apt-transport-https and ca-certificates
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
 
-- import_tasks: Debian.yml
-  when: ansible_os_family == "Debian"
+- name: Debian/Ubuntu | Setting webupd8 repository
+  apt_repository:
+    repo: 'ppa:webupd8team/java'
+    codename: 'xenial'
 
-- name: Create elasticsearch.service.d folder.
-  file: path=/etc/systemd/system/elasticsearch.service.d/ state=directory
-  when:
-    - ansible_service_mgr == "systemd"
+- when: elasticsearch_install_java
+  block:
+    - name: Debian/Ubuntu | Accept Oracle Java 8 license
+      debconf:
+        name: oracle-java8-installer
+        question: shared/accepted-oracle-license-v1-1
+        value: true
+        vtype: boolean
 
-- name: Configure Elasticsearch System Resources.
-  template:
-    src: elasticsearch_systemd.conf.j2
-    dest: /etc/systemd/system/elasticsearch.service.d/elasticsearch.conf
-    owner: root
-    group: elasticsearch
-    mode: 0660
-  notify: restart elasticsearch
-  tags: configure
-  when:
-    - ansible_service_mgr == "systemd"
+    - name: Debian/Ubuntu | Oracle Java 8 installer
+      apt: name=oracle-java8-installer state=present update_cache=yes
+      tags: install
 
-- name: Debian/Ubuntu | Configure Elasticsearch System Resources.
-  template:
-    src: elasticsearch_nonsystemd.j2
-    dest: /etc/default/elasticsearch
-    owner: root
-    group: elasticsearch
-    mode: 0660
-  notify: restart elasticsearch
-  tags: configure
-  when:
-    - ansible_service_mgr != "systemd"
-    - ansible_os_family == "Debian"
+- name: Debian/Ubuntu | Add Elasticsearch GPG key.
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
 
-- name: RedHat/CentOS/Fedora | Configure Elasticsearch System Resources.
-  template:
-    src: elasticsearch_nonsystemd.j2
-    dest: /etc/sysconfig/elasticsearch
-    owner: root
-    group: elasticsearch
-    mode: 0660
-  notify: restart elasticsearch
-  tags: configure
-  when:
-    - ansible_service_mgr != "systemd"
-    - ansible_os_family == "RedHat"
+- name: Debian/Ubuntu | Install Elastic repo
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/6.x/apt stable main'
+    state: present
+    filename: 'elastic_repo'
+
+- name: Debian/Ubuntu | Install Elasticsarch
+  apt: name=elasticsearch={{ elastic_stack_version }} state=present update_cache=yes
+  tags: install
 
 - name: Configure Elasticsearch.
   template:
@@ -83,9 +73,3 @@
   tags:
     - configure
     - init
-
-- import_tasks: "RMRedHat.yml"
-  when: ansible_os_family == "RedHat"
-
-- import_tasks: "RMDebian.yml"
-  when: ansible_os_family == "Debian"
