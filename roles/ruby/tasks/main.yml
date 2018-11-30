@@ -1,7 +1,0 @@
----
-
-- name: Install RVM
-  include: 'rvm.yml'
-
-- name: Install Ruby and Gems
-  include: 'rubies.yml'
