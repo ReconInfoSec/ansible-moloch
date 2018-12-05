@@ -1,4 +1,4 @@
-# recon-moloch
+# ansible-moloch
 
 This role will deploy Elasticsearch and Moloch to a single system, currently only tested on Ubuntu 16.04.
 
