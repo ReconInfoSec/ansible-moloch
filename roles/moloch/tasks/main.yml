@@ -13,6 +13,12 @@
   apt:
     deb: https://files.molo.ch/builds/ubuntu-16.04/moloch_1.1.1-1_amd64.deb
 
+- name: Copy configuration script
+  copy:
+    src: files/Configure
+    dest: /data/moloch/bin/Configure
+    mode: 0755
+
 - name: Run configuration script
   shell: /data/moloch/bin/Configure
   environment:
@@ -21,8 +27,6 @@
     MOLOCH_ELASTICSEARCH: "{{ elasticsearch_network_protocol }}://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }}"
     MOLOCH_PASSWORD: "{{ moloch_admin_password }}"
     MOLOCH_INET: yes"
-  tags:
-    - moloch
 
 - name: Initialize Elasticsearch
   command: /data/moloch/db/db.pl {{ elasticsearch_network_protocol }}://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }} init
